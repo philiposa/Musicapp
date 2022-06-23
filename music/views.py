@@ -4,7 +4,7 @@ from .models import Album
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Podcast
-from rest_framework.decorators import api_view
+from rest_framework import status
 from .serializer import PodcastSerializer
 
 
@@ -21,16 +21,15 @@ def detail(request, album_id):
     return render(request, 'music/detail.html', {'album': album})
 
 
-@api_view(['GET'])
-def get(request):
-    podcasts = Podcast.objects.all()
-    serializers = PodcastSerializer(podcasts, many=True)
-    return Response(serializers.data)
+class PodcastList(APIView):
+    def get(self, request):
+        podcasts = Podcast.objects.all()
+        serializers = PodcastSerializer(podcasts, many=True)
+        return Response(serializers.data)
 
+    def post(self, request):
+        serializers = PodcastSerializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+        return Response(serializers.data)
 
-@api_view(['PUT'])
-def add(request):
-    serializers = PodcastSerializer(data=request.data)
-    if serializers.is_valid():
-        serializers.save()
-    return Response(serializers.data)
