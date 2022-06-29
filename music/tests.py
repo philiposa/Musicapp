@@ -1,28 +1,22 @@
-from django.test import TestCase, Client
-from django.urls import reverse
-from .models import Album, Podcast, Episode
-from rest_framework.authtoken.models import Token
-from rest_framework.test import APITestCase
-from rest_framework import status
-from .serializer import PodcastSerializer, EpisodeSerializer
-from rest_framework.test import APIRequestFactory
+from django.test import SimpleTestCase
+from django.urls import reverse, resolve
 
 
-class TestViews(TestCase):
+class SimpleTestViews(SimpleTestCase):
 
-    def test_index_GET(self):
-        client = Client()
-        response = client.get(reverse('index'))
-        self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'music/index.html')
+    def test_podcast_url(self):
+        url = reverse('get_podcast')
+        self.assertEqual(resolve(url).route, 'podcast/')
 
-    def test_detail_GET(self):
-        client = Client()
-        response = client.get(reverse('detail', Album.album_id))
-        self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'music/detail.html')
+    def test_episode_url(self):
+        url = reverse('get_episode')
+        self.assertEqual(resolve(url).route, 'episode/')
 
+    def test_detail_url(self):
+        url = reverse('detail', args=[1])
+        self.assertEqual(resolve(url).route, 'music/<int:album_id>')
 
-
-
+    def test_index_url(self):
+        url = reverse('index')
+        self.assertEqual(resolve(url).route, 'music/')
 
